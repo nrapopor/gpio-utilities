@@ -16,4 +16,4 @@ fi
 if [ $1 -eq 5 ]; then
 	ARG_P=-pP40,P41,P42,P43,P44,P45,P46,P47
 fi
-sudo ~/bin/runTest.sh ${ARG_P}
+~/bin/runTest.sh ${ARG_P}
