@@ -19,6 +19,8 @@
 		<log4j.version>2.4</log4j.version>
 		<commonscli.version>1.3.1</commonscli.version>
 		<bulldog.version>0.2.1</bulldog.version>
+		<bulldog.target.board>bulldog-board-beagleboneblack</bulldog.target.board>
+		<!-- bulldog.target.board>bulldog-board-raspberrypi</bulldog.target.board-->
 		<commons-csv.version>1.2</commons-csv.version>
 		<maven-dependency-plugin.version>2.10</maven-dependency-plugin.version>
 		<maven-assembly-plugin.version>2.6</maven-assembly-plugin.version>
@@ -26,8 +28,12 @@
 		<exec-maven-plugin.version>1.4.0</exec-maven-plugin.version>
 		<maven.wagon.plugin.version>1.0</maven.wagon.plugin.version>
 		<main.class>com.nrapoport.embeded.gpio.utilities.ValidateGPIO</main.class>
-		<target.serverid>ubuntu3b</target.serverid>
+		<target.serverid>render3b</target.serverid>
 		<target.userid>ubuntu</target.userid>
+		<!--  <target.serverid>kenspi</target.serverid> -->
+		<!--  <target.userid>pi</target.userid> -->
+		<!--  target.serverid>ubuntu3b</target.serverid>-->
+		<!--  target.userid>ubuntu</target.userid>-->
 	</properties>
 	<build>
 		<resources>
@@ -223,7 +229,7 @@
 		</dependency>
 		<dependency>
 			<groupId>io.silverspoon</groupId>
-			<artifactId>bulldog-board-beagleboneblack</artifactId>
+			<artifactId>${bulldog.target.board}</artifactId>
 			<version>${bulldog.version}</version>
 		</dependency>
 		<dependency>
