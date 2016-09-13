@@ -154,8 +154,8 @@ This utility will need to be built using ``maven`` [https://maven.apache.org/](h
     RELEASE=`lsb_release -cs`
     LINE_CNT=`grep  "http://ppa.launchpad.net/webupd8team" /etc/apt/sources.list | wc -l`
     if [[ ! ${LINE_CNT} -gt 1 ]]; then
-            sudo echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu ${RELEASE} main" | sudo tee -a /etc/apt/sou
-            sudo echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu ${RELEASE} main" | sudo tee -a /etc/apt
+            sudo echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu ${RELEASE} main" | sudo tee -a /etc/apt/sources.list
+            sudo echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu ${RELEASE} main" | sudo tee -a /etc/apt/sources.list
             sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886
     fi
     sudo apt-get update
@@ -285,13 +285,16 @@ This utility will need to be built using ``maven`` [https://maven.apache.org/](h
            needed otherwise no
 
 10.  If everything goes well: 
-    - the bin folder on the BBB will have the shell script wrappers for    
+   - The bin folder on the BBB will have the shell script wrappers for    
       the project.
-> -rwxr-xr-x  1 ubuntu ubuntu  168 Apr 22 09:59 deployTest.sh
-> -rwxr-xr-x  1 ubuntu ubuntu  214 Apr 22 09:59 runTest.sh
-> -rwxr-xr-x  1 ubuntu ubuntu  405 Apr 22 09:59 testBank.sh
+      
+```sh
+        -rwxr-xr-x  1 ubuntu ubuntu  168 Apr 22 09:59 deployTest.sh
+        -rwxr-xr-x  1 ubuntu ubuntu  214 Apr 22 09:59 runTest.sh
+        -rwxr-xr-x  1 ubuntu ubuntu  405 Apr 22 09:59 testBank.sh
+```
+ - They are :
 
-    - They are :
    | Script  | Purpose 
    | :---  | :--- 
    | `deployTest.sh`| (Re)deploys the project after the build
