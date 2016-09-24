@@ -10,20 +10,19 @@ This utility is used for GPIO pin testing of my custom cape for BeagleBone Black
 I've leveraged a bulldog library, as well as the RGB-123 cape projects (see attributions below). 
 
 The idea behind this utility is the 48 pins I have on my cape (they are named P0 - P47)    
-this maps to the bulldog library pins which are in the fomat P[8,9]_(01-46)  where the first part refers    
-to the header P8 or P9 and the secon part referes to the actual pin number 01 - 46, per header. Also most of   
-the pins have a GPIOX_XX name, that identifies the GPIO bank 0 - 3 and the pin ID on that bank.    
-The kernel pin number needed to address that pin with scripting is calculated from the bank mltiplied by 32    
+this maps to the bulldog library pins which are in the format P[8,9]_(01-46) where the first part refers to    the header P8 or P9 and the second part refers to the actual pin number 01 - 46, per header and LEDScape     pins in the format L[0-4]{0,1}[0-9] in the range L0-L47).     
+Also most of the pins have a GPIOX_XX name, that identifies the GPIO bank 0 - 3 and the pin ID on that bank.     
+The kernel pin number needed to address that pin with scripting is calculated from the bank multiplied by 32         
 then the actual pin value added to it. Simple really :stuck_out_tongue_winking_eye: 
 
 ### Gory Details 
-* This utility can be used a cople of ways.
+* This utility can be used a couple of ways.
   1. Trigger a pin or a list of pins by bulldog name or cape name as input or output    
      - This will turn on/off the selected pin(s) with 1/2 second interval 10 times (for output)
-     - wait for the pin to go high -- print PRESSED message, when button is relased (pin return to low)    
+     - wait for the pin to go high -- print PRESSED message, when button is released (pin return to low)    
        print RELEASED message
-  2. Query the pin (or all pins) using cape name or bulldog name and get the description that    
-     will include all the known names for the pin and the bank and pin location    
+  2. Query the pin (or all pins) using cape name, bulldog name, or LEDScape name and get the description      
+     that will include all the known names for the pin and the bank and pin location    
      The output can be configured to be ``JSON/XML/CSV`` with the default being ``JSON``
 * NOTE: Since the bulldog library is using ``/dev/mem`` the JVM will need to be launched    
         with ``sudo`` or adding the user to the group that has access to the ``/dev/mem``
@@ -40,17 +39,17 @@ This utility will need to be built using ``maven`` [https://maven.apache.org/](h
 ### Windows
 
 1. Download and install(unzip) Maven I recommend a short path with no spaces in it like ``c:\tools\``    
-    so the final path to mave would be something like ``c:\tools\apache-maven-X.X.X`` where     
+    so the final path to maven would be something like ``c:\tools\apache-maven-X.X.X`` where     
     ``X.X.X`` is the maven version
 2. Create a ``.m2`` folder under your user id    
    on Windows 7+ this means ``C:\Users\<your login id>``     
    on older versions ``C:\Documents and Settings\<your login id>``    
-   - NOTE: This cannot be done graphicaly in ``explorer`` only on the command line using    
+   - NOTE: This cannot be done graphically in ``explorer`` only on the command line using    
  ```cmd
      md .m2     
  ```
 
-3. Copy the ``settings.xml`` from maven instalation folder like ``c:\tools\apache-maven-3.3.9\conf``
+3. Copy the ``settings.xml`` from maven installation folder like ``c:\tools\apache-maven-3.3.9\conf``
 
   + NOTE: I recommend against installing into "Program Files" we will be using command line and     
         scripting. Spaces in folder/file names and scripts do not mix.
@@ -71,12 +70,12 @@ This utility will need to be built using ``maven`` [https://maven.apache.org/](h
 
    | Tag  | value   | description 
    | :---: | :---:  | :--- 
-   | id | bbb-name  | * The name of the Beaglebone black. if you did not name it before, add the proper entry in your ``C:\Windows\system32\drivers\etc\hosts`` file. for example  ``bbb-name 192.168.1.145`` obviously using your own name and the actuall BBB IP address
+   | id | bbb-name  | * The name of the Beaglebone black. if you did not name it before, add the proper entry in your ``C:\Windows\system32\drivers\etc\hosts`` file. for example  ``bbb-name 192.168.1.145`` obviously using your own name and the actually BBB IP address
    | username | ubuntu/debian/pi | the name of the user id on the BBB/Raspberry PI
    | password | password | the user password on the BBB/PI usually `ubuntu/temppwd` `pi/raspberry` respectively
 
 6.	On the BeagleBone Black in your ``home`` folder create two folders ``bin`` and ``projects`` These    
-   folders are needed for the tool deployement on the BBB :
+   folders are needed for the tool deployment on the BBB :
  ```sh
     mkdir ~/bin
     mkdir ~/projects
@@ -100,7 +99,7 @@ This utility will need to be built using ``maven`` [https://maven.apache.org/](h
    (also M3 and M3_HOME) set to properly run maven. 
    - NOTE: (M3/M3_HOME may not be needed, however this was an issue at one point so I'm keeping them)
    - You can add the following to your system environment variables and PATH or create a    
-     setenv_m3.cmd in a convient location (one that's been added to the system path, for me it's ``c:\work\bin``
+     setenv_m3.cmd in a convenient location (one that's been added to the system path, for me it's ``c:\work\bin``
      or simply put it into the current folder (where you checked out this project).
 
  ```cmd
@@ -121,7 +120,7 @@ This utility will need to be built using ``maven`` [https://maven.apache.org/](h
            mvn wagon:update-maven-3
            mvn clean install
  ```
-   - NOTE: There are missing dependencies required to run the waggon plugin I'm using    
+   - NOTE: There are missing dependencies required to run the wagon plugin I'm using    
            so before building, the ``wagon:update-maven-3`` target must be executed. This only   
            needs to happen once per version of maven.
 

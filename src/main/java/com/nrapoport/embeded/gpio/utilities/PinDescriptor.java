@@ -20,6 +20,20 @@ public class PinDescriptor implements Serializable {
 
     public static final String BULLDOG_PIN_FORMAT = ConfigSettings.getString("PinDescriptor.bulldog-pin-format");
 
+    public static final String CAPE_PIN_ID = ConfigSettings.getString("PinDescriptor.cape-pin"); //$NON-NLS-1$
+
+    public static final String HEADER = ConfigSettings.getString("PinDescriptor.header"); //$NON-NLS-1$
+
+    public static final String HEADER_PIN = ConfigSettings.getString("PinDescriptor.header-pin"); //$NON-NLS-1$
+
+    public static final String LEDSCAPE_PIN_FORMAT = ConfigSettings.getString("PinDescriptor.ledscape-pin-format");
+
+    public static final String LEDSCAPE_PIN_ID = ConfigSettings.getString("PinDescriptor.ledscape-pin"); //$NON-NLS-1$
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PinDescriptor.class);
+
+    public static final String NAME = ConfigSettings.getString("PinDescriptor.name"); //$NON-NLS-1$
+
     private static QueryOutputFormat queryFormat;
 
     /**
@@ -29,16 +43,6 @@ public class PinDescriptor implements Serializable {
      * </DL>
      */
     private static final long serialVersionUID = 1L;
-
-    private static org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PinDescriptor.class);
-
-    public static String NAME = ConfigSettings.getString("PinDescriptor.name"); //$NON-NLS-1$
-
-    public static String HEADER = ConfigSettings.getString("PinDescriptor.header"); //$NON-NLS-1$
-
-    public static String HEADER_PIN = ConfigSettings.getString("PinDescriptor.header-pin"); //$NON-NLS-1$
-
-    public static String CAPE_PIN_ID = ConfigSettings.getString("PinDescriptor.cape-pin"); //$NON-NLS-1$
 
     /**
      * <DL>
@@ -149,8 +153,7 @@ public class PinDescriptor implements Serializable {
     /**
      * <DL>
      * <DT>Description:</DT>
-     * <DD>PinDescriptor Constructor from a map that contains keys & values for Header, HeaderPin, Name and CapePinId
-     * </DD>
+     * <DD>PinDescriptor Constructor from a map that contains keys & values for Header, HeaderPin, Name and CapePinId</DD>
      * <DT>Date:</DT>
      * <DD>Apr 12, 2016</DD>
      * </DL>
@@ -207,6 +210,7 @@ public class PinDescriptor implements Serializable {
             descriptor.put(HEADER_PIN, "0"); //$NON-NLS-1$
             descriptor.put(NAME, "GPIO0_0"); //$NON-NLS-1$
             descriptor.put(CAPE_PIN_ID, "0"); //$NON-NLS-1$
+            descriptor.put(LEDSCAPE_PIN_ID, ""); //$NON-NLS-1$
         }
         return descriptor;
     }
@@ -252,12 +256,27 @@ public class PinDescriptor implements Serializable {
     int getKernelPin() {
         final String name = getDescriptor().get(NAME);
         final String[] vars =
-            (name != null && name.indexOf("GPIO") > -1) ? name.substring(4).split("_") : new String[] { name, "" }; //$NON-NLS-1$ $NON-NLS-2$
+            name != null && name.indexOf("GPIO") > -1 ? name.substring(4).split("_") : new String[] { name, "" }; //$NON-NLS-1$ $NON-NLS-2$
         if (vars.length > 1) {
             log.trace("[1]={} [2]={}", vars[0], vars[1]); //$NON-NLS-1$
         }
-        return name.indexOf("GPIO") > -1 ? (Integer.parseInt(vars[0]) * 32) + Integer.parseInt(vars[1]) : 0; //$NON-NLS-1$
+        return name.indexOf("GPIO") > -1 ? Integer.parseInt(vars[0]) * 32 + Integer.parseInt(vars[1]) : 0; //$NON-NLS-1$
 
+    }
+
+    /**
+     * <DL>
+     * <DT>Description:</DT>
+     * <DD>The LEDScape Mapping for this pin</DD>
+     * <DT>Date:</DT>
+     * <DD>Apr 12, 2016</DD>
+     * </DL>
+     *
+     * @return the header this pin is on
+     */
+    String getLEDScapePin() {
+        final String ledPin = String.format(LEDSCAPE_PIN_FORMAT, getDescriptor().get(LEDSCAPE_PIN_ID));
+        return ledPin.equalsIgnoreCase("L") ? "" : ledPin;
     }
 
     /**
@@ -307,6 +326,6 @@ public class PinDescriptor implements Serializable {
     @Override
     public String toString() {
         return String.format(getRowFormat(), getBulldogHeaderPin(), getHeader(), getPin(), getName(), getCapePin(),
-            getKernelPin());
+            getKernelPin(), getLEDScapePin());
     }
 }

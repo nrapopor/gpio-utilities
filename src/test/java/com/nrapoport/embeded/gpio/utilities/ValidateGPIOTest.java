@@ -128,12 +128,12 @@ public class ValidateGPIOTest {
      */
     @Test
     public final void test04ValidateGPIO() {
-        final String[] args = new String[] { "-dout", "-pP0,P46,P8_22" };
+        final String[] args = new String[] { "-dout", "-pP0,P46,P8_22,L13" };
         final ValidateGPIO vGPIO = new ValidateGPIO(args);
         assertNotNull(vGPIO);
         assertEquals(CLIParseStatus.SUCCESS, vGPIO.getStatus());
         assertEquals(ValidateGPIO.DIRECTION_OUT, vGPIO.getOptionValues().get(ValidateGPIO.DIRECTION_SHORT));
-        final String[] expecteds = new String[] { "P8_32", "P9_21", "P8_22" };
+        final String[] expecteds = new String[] { "P8_32", "P9_21", "P8_22", "P9_11" };
         @SuppressWarnings("unchecked")
         final List<String> list = (List<String>) vGPIO.getOptionValues().get(ValidateGPIO.PIN_LIST_SHORT);
         assertArrayEquals(expecteds, list.toArray(new String[list.size()]));
@@ -162,11 +162,11 @@ public class ValidateGPIOTest {
      */
     @Test
     public final void test06ValidateGPIO() {
-        final String[] expecteds = new String[] { "P8_32", "P9_21", "P8_22" };
+        final String[] expecteds = new String[] { "P8_32", "P9_21", "P8_22", "P9_11" };
         final List<String> validQueryFromats = Arrays.asList(new String[] { "-fJSON", "-fCSV", "-fXML", "" });
         for (int i = 0; i < validQueryFromats.size(); i++) {
             log.debug("QUERY_FORMAT={}", validQueryFromats.get(i));
-            final String[] args = new String[] { "-dout", "-qP0,P46,P8_22", validQueryFromats.get(i) };
+            final String[] args = new String[] { "-dout", "-qP0,P46,P8_22,L13", validQueryFromats.get(i) };
             final ValidateGPIO vGPIO = new ValidateGPIO(args);
             assertNotNull(vGPIO);
             assertEquals(CLIParseStatus.SUCCESS, vGPIO.getStatus());

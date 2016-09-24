@@ -1,5 +1,15 @@
 package com.nrapoport.embeded.gpio.utilities;
 
+import io.silverspoon.bulldog.core.Signal;
+import io.silverspoon.bulldog.core.gpio.DigitalInput;
+import io.silverspoon.bulldog.core.gpio.DigitalOutput;
+import io.silverspoon.bulldog.core.pin.PinBlockedException;
+import io.silverspoon.bulldog.core.platform.Board;
+import io.silverspoon.bulldog.core.platform.Platform;
+import io.silverspoon.bulldog.core.util.BulldogUtil;
+import io.silverspoon.bulldog.devices.switches.Button;
+import io.silverspoon.bulldog.devices.switches.ButtonListener;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,16 +33,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
-
-import io.silverspoon.bulldog.core.Signal;
-import io.silverspoon.bulldog.core.gpio.DigitalInput;
-import io.silverspoon.bulldog.core.gpio.DigitalOutput;
-import io.silverspoon.bulldog.core.pin.PinBlockedException;
-import io.silverspoon.bulldog.core.platform.Board;
-import io.silverspoon.bulldog.core.platform.Platform;
-import io.silverspoon.bulldog.core.util.BulldogUtil;
-import io.silverspoon.bulldog.devices.switches.Button;
-import io.silverspoon.bulldog.devices.switches.ButtonListener;
 
 /**
  * @author nrapopor
@@ -70,6 +70,7 @@ public class ValidateGPIO {
     public static final String CAPE_PIN_MAP = ConfigSettings.getString("ValidateGPIO.pins-cape-pin-map"); //$NON-NLS-1$
 
     public static final String DIRECTION = ConfigSettings.getString("ValidateGPIO.direction-long"); //$NON-NLS-1$
+
     //private static final String PIN_LIST_ID = "p"; //$NON-NLS-1$
 
     public static final String DIRECTION_SHORT = ConfigSettings.getString("ValidateGPIO.direction-short"); //$NON-NLS-1$
@@ -89,6 +90,7 @@ public class ValidateGPIO {
     public static final List<String> DIRECTION_VALID = Arrays.asList(DIRECTION_VALID_STR.split(LIST_SEPARATOR_REGEX));
 
     public static final String QUERY_FORMAT = ConfigSettings.getString("ValidateGPIO.query-format-long"); //$NON-NLS-1$
+
     //private static final String PIN_LIST_ID = "p"; //$NON-NLS-1$
 
     public static final String QUERY_FORMAT_SHORT = ConfigSettings.getString("ValidateGPIO.query-format-short"); //$NON-NLS-1$
@@ -99,17 +101,18 @@ public class ValidateGPIO {
 
     public static final String QUERY_FORMAT_DEFAULT = ConfigSettings.getString("ValidateGPIO.query-format-default"); //$NON-NLS-1$
 
-    public static final String QUERY_FORMAT_VALID_STR =
-        ConfigSettings.getString("ValidateGPIO.query-format-valid-list"); //$NON-NLS-1$
+    public static final String QUERY_FORMAT_VALID_STR = ConfigSettings
+        .getString("ValidateGPIO.query-format-valid-list"); //$NON-NLS-1$
 
-    public static final List<String> QUERY_FORMAT_VALID =
-        Arrays.asList(QUERY_FORMAT_VALID_STR.split(LIST_SEPARATOR_REGEX));
+    public static final List<String> QUERY_FORMAT_VALID = Arrays.asList(QUERY_FORMAT_VALID_STR
+        .split(LIST_SEPARATOR_REGEX));
 
     public static final String HELP = "help"; //$NON-NLS-1$
 
     public static final String HELP_ID = "h"; //$NON-NLS-1$
 
     public static final String QUERY = ConfigSettings.getString("ValidateGPIO.query-long"); //$NON-NLS-1$
+
     //private static final String PIN_LIST_ID = "p"; //$NON-NLS-1$
 
     public static final String QUERY_SHORT = ConfigSettings.getString("ValidateGPIO.query-short"); //$NON-NLS-1$
@@ -137,6 +140,8 @@ public class ValidateGPIO {
     private Map<String, PinDescriptor> pinMappings = new HashMap<>();
 
     private Map<String, PinDescriptor> pinReverseMappings = new HashMap<>();
+
+    private Map<String, PinDescriptor> pinLEDScapeMappings = new HashMap<>();
 
     /**
      * <DL>
@@ -169,26 +174,26 @@ public class ValidateGPIO {
     protected Options configureOptions() {
         final Options argOptions = new Options();
         argOptions // add options
-            .addOption( // add an option
-                Option.builder(HELP_ID) // using option builder
-                    .argName(HELP) // name
-                    .longOpt(HELP) // long option name
-                    .hasArg(false) // has # arguments or not
-                    .desc("print this help message") //$NON-NLS-1$
-                    .required(false) // required or not
-                    .build()) // create
+        .addOption( // add an option
+            Option.builder(HELP_ID) // using option builder
+            .argName(HELP) // name
+            .longOpt(HELP) // long option name
+            .hasArg(false) // has # arguments or not
+            .desc("print this help message") //$NON-NLS-1$
+            .required(false) // required or not
+            .build()) // create
             .addOption( // add an option
                 Option.builder(DIRECTION_SHORT) // using option builder
-                    .argName(DIRECTION_NAME) // name
-                    .longOpt(DIRECTION) // long option name
-                    .hasArg(true) // has # arguments or not
-                    //.numberOfArgs(48) // number of arguments
-                    //.type(Integer.class) // the value type
-                    .desc(formatDescription(DIRECTION_DESC, DIRECTION_DEFAULT, DIRECTION_VALID_STR)) // description
-                    .required(false) // required or not
-                    .build()) // create
-            .addOption( // add an option
-                Option.builder(QUERY_FORMAT_SHORT) // using option builder
+                .argName(DIRECTION_NAME) // name
+                .longOpt(DIRECTION) // long option name
+                .hasArg(true) // has # arguments or not
+                //.numberOfArgs(48) // number of arguments
+                //.type(Integer.class) // the value type
+                .desc(formatDescription(DIRECTION_DESC, DIRECTION_DEFAULT, DIRECTION_VALID_STR)) // description
+                .required(false) // required or not
+                .build()) // create
+                .addOption( // add an option
+                    Option.builder(QUERY_FORMAT_SHORT) // using option builder
                     .argName(QUERY_FORMAT_NAME) // name
                     .longOpt(QUERY_FORMAT) // long option name
                     .hasArg(true) // has # arguments or not
@@ -197,29 +202,28 @@ public class ValidateGPIO {
                     .desc(formatDescription(QUERY_FORMAT_DESC, QUERY_FORMAT_DEFAULT, QUERY_FORMAT_VALID_STR)) // description
                     .required(false) // required or not
                     .build()); // create
-        final OptionGroup optGroup = new OptionGroup()
-            .addOption( // add an option
-                Option.builder(PIN_LIST_SHORT) // using option builder
-                    .argName(PIN_LIST_NAME) // name
-                    .longOpt(PIN_LIST) // long option name
-                    .hasArgs() // has # arguments or not
-                    .numberOfArgs(46) // number of arguments
-                    .valueSeparator(',') //values separator
-                    //.type(Integer.class) // the value type
-                    .desc(formatDescription(PIN_LIST_DESC, PIN_LIST_DEFAULT_STR, null)) // description
-                    .required(false) // required or not
-                    .build()) // create
+        final OptionGroup optGroup = new OptionGroup().addOption( // add an option
+            Option.builder(PIN_LIST_SHORT) // using option builder
+                .argName(PIN_LIST_NAME) // name
+                .longOpt(PIN_LIST) // long option name
+                .hasArgs() // has # arguments or not
+                .numberOfArgs(46) // number of arguments
+                .valueSeparator(',') //values separator
+                //.type(Integer.class) // the value type
+                .desc(formatDescription(PIN_LIST_DESC, PIN_LIST_DEFAULT_STR, null)) // description
+                .required(false) // required or not
+                .build()) // create
             .addOption( // add an option
                 Option.builder(QUERY_SHORT) // using option builder
-                    .argName(QUERY_NAME) // name
-                    .longOpt(QUERY) // long option name
-                    .hasArgs() // has # arguments or not
-                    .numberOfArgs(46) // number of arguments
-                    .valueSeparator(',') //values separator
-                    //.type(Integer.class) // the value type
-                    .desc(formatDescription(QUERY_DESC, QUERY_DEFAULT, null)) // description
-                    .required(false) // required or not
-                    .build()); // create
+                .argName(QUERY_NAME) // name
+                .longOpt(QUERY) // long option name
+                .hasArgs() // has # arguments or not
+                .numberOfArgs(46) // number of arguments
+                .valueSeparator(',') //values separator
+                //.type(Integer.class) // the value type
+                .desc(formatDescription(QUERY_DESC, QUERY_DEFAULT, null)) // description
+                .required(false) // required or not
+                .build()); // create
         optGroup.setRequired(false);
         argOptions.addOptionGroup(optGroup);
         //      .addOption( // add an option
@@ -296,8 +300,8 @@ public class ValidateGPIO {
                             BulldogUtil.sleepMs(500);
                         }
                     } catch (final PinBlockedException ex) {
-                        log.warn("Pin {}/{} is blocked : {} ", pinName,
-                            getPinReverseMappings().get(pinName).getCapePin(), ex.getMessage());
+                        log.warn("Pin {}/{} is blocked : {} ", pinName, getPinReverseMappings().get(pinName)
+                            .getCapePin(), ex.getMessage());
                     }
                 }
             } else if (direction.equalsIgnoreCase(DIRECTION_IN)) {
@@ -411,6 +415,21 @@ public class ValidateGPIO {
     /**
      * <DL>
      * <DT>Description:</DT>
+     * <DD>
+     * Getter for the pinLEDScapeMappings property</DD>
+     * <DT>Date:</DT>
+     * <DD>Sep 24, 2016</DD>
+     * </DL>
+     *
+     * @return the value of pinLEDScapeMappings field
+     */
+    public Map<String, PinDescriptor> getPinLEDScapeMappings() {
+        return pinLEDScapeMappings;
+    }
+
+    /**
+     * <DL>
+     * <DT>Description:</DT>
      * <DD>Getter for the pinMappings property</DD>
      * <DT>Date:</DT>
      * <DD>Apr 12, 2016</DD>
@@ -470,6 +489,9 @@ public class ValidateGPIO {
                 final PinDescriptor pin = new PinDescriptor(record);
                 if (pin.getCapePin() != null && !pin.getCapePin().isEmpty()) {
                     getPinMappings().put(pin.getCapePin(), pin);
+                    if (!pin.getLEDScapePin().isEmpty()) {
+                        getPinLEDScapeMappings().put(pin.getLEDScapePin(), pin);
+                    }
                 }
                 getPinReverseMappings().put(pin.getBulldogHeaderPin(), pin);
             }
@@ -495,8 +517,7 @@ public class ValidateGPIO {
      *            the list of the resolved bulldog library pins (to be updated)
      * @param pinsToTest
      *            the pins from the command line
-     * @return
-     *         <DL>
+     * @return <DL>
      *         <DT><code>true</code></DT>
      *         <DD>successfully parsed and mapped the incomming pins</DD>
      *         <DT><code>false</code></DT>
@@ -510,6 +531,16 @@ public class ValidateGPIO {
             if (capePin.contains("_")) { //we got a header pin directly P[89]_[0-4]*[0-9]
                 if (capePin.toUpperCase().matches(PIN_LIST_HEADER_REGEX)) {
                     pins.add(capePin);
+                }
+            } else if (capePin.contains("L")) { //we got a LEDScpe pin directly L[0-4]{0,1}[0-9]
+                if (getPinLEDScapeMappings().containsKey(capePin)) {
+                    pins.add(getPinLEDScapeMappings().get(capePin).getBulldogHeaderPin());
+                } else {
+                    setParseErrorMessage(String.format(PARSE_ERROR_FMT, "invalid pin: " + capePin));
+                    log.error(getParseErrorMessage());
+                    setStatus(CLIParseStatus.INVALID_OPTION);
+                    valid = false;
+                    break;
                 }
             } else {
                 if (getPinMappings().containsKey(capePin)) {
@@ -561,8 +592,8 @@ public class ValidateGPIO {
                 } else {
                     getOptionValues().put(QUERY_FORMAT_SHORT, QUERY_FORMAT_DEFAULT);
                 }
-                PinDescriptor
-                    .setQueryFormat(QueryOutputFormat.valueOf(getOptionValues().get(QUERY_FORMAT_SHORT).toString()));
+                PinDescriptor.setQueryFormat(QueryOutputFormat.valueOf(getOptionValues().get(QUERY_FORMAT_SHORT)
+                    .toString()));
                 processPins(line, new ArrayList<String>(), PIN_LIST_SHORT, PIN_LIST_DEFAULT);
                 getOptionValues().put(PIN_LIST_EXISTS, line.hasOption(PIN_LIST_SHORT));
                 if (line.hasOption(QUERY_SHORT)) {
@@ -621,8 +652,8 @@ public class ValidateGPIO {
             }
         }
         if (!valid) {
-            setParseErrorMessage(String.format(PARSE_ERROR_FMT,
-                "invalid " + option_long + " passed, valid " + option_long + " values are: " + validList.toString()));
+            setParseErrorMessage(String.format(PARSE_ERROR_FMT, "invalid " + option_long + " passed, valid "
+                + option_long + " values are: " + validList.toString()));
             setStatus(CLIParseStatus.INVALID_OPTION);
         }
     }
@@ -677,7 +708,8 @@ public class ValidateGPIO {
             first = false;
         }
         sb.append(trailer);
-        log.info(sb.toString());
+        log.trace(sb.toString());
+        System.out.println(sb.toString());
     }
 
     /**
@@ -723,6 +755,22 @@ public class ValidateGPIO {
      */
     public void setParseErrorMessage(final String aParseErrorMessage) {
         parseErrorMessage = aParseErrorMessage;
+    }
+
+    /**
+     * <DL>
+     * <DT>Description:</DT>
+     * <DD>
+     * Setter for the pinLEDScapeMappings property</DD>
+     * <DT>Date:</DT>
+     * <DD>Sep 24, 2016</DD>
+     * </DL>
+     *
+     * @param pinLEDScapeMappings
+     *            new value for the pinLEDScapeMappings property
+     */
+    public void setPinLEDScapeMappings(final Map<String, PinDescriptor> pinLEDScapeMappings) {
+        this.pinLEDScapeMappings = pinLEDScapeMappings;
     }
 
     /**
@@ -807,7 +855,7 @@ public class ValidateGPIO {
         final HelpFormatter formatter = new HelpFormatter();
         formatter.setWidth(120);
         final StringBuilder line = new StringBuilder().append("java ") //$NON-NLS-1$
-            .append(mainClassName);
+                .append(mainClassName);
         // formatter.
         formatter.printHelp(line.toString(), getOptions(), true);
     }
