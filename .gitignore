@@ -1,2 +1,5 @@
 target
 *.bak
+.m2
+
+x2-display.pins.json
